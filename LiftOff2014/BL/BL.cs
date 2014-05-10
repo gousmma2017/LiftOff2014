@@ -47,6 +47,15 @@ namespace LiftOff2014.BL
             return this.liftOffDAC.GetCandidateVotesForCounty(countyID); 
         }
 
+        public bool CheckPassword(string password)
+        {
+            bool isValid = false;
+
+            if (password.ToUpper() == "TELEMETRY") isValid = true; 
+
+            return isValid; 
+
+        }
 
         private LiftOffDAC _liftOffDAC;
         private LiftOffDAC liftOffDAC

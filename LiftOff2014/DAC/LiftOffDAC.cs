@@ -57,7 +57,7 @@ namespace LiftOff2014.DAC
         {
             County county = new County(); 
 
-            string sql = "select CountyName, TotalVotes, ProjectedEdVotes from Counties where CountyID = " + countyID.ToString();
+            string sql = "select CountyName, TotalVotes from Counties where CountyID = " + countyID.ToString();
 
             try
             {
@@ -73,7 +73,6 @@ namespace LiftOff2014.DAC
                         county.CountyID = countyID;
                         county.CountyName = dr["CountyName"].ToString();
                         county.TotalVotes = int.Parse(dr["TotalVotes"].ToString());
-                        county.ProjectedVotes = int.Parse(dr["ProjectedEdVotes"].ToString());
                     }
                 }
             }
@@ -122,7 +121,7 @@ namespace LiftOff2014.DAC
         {
             List<Candidate> candidates = new List<Candidate>();
 
-            string sql = "select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID group by cand.CandidateID, cand.DisplayName";
+            string sql = "select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes', isnull(sum(pvotes.ProjectedVotes),0), dbo.FnGetTotalVotesCast() 'TotalVotesCast', dbo.FnGetTotalVotesAvailable() 'TotalVotesAvailable' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID left join CandidateProjectedVotes pvotes cand.CandidateID = pvotes.CandidateID  group by cand.CandidateID, cand.DisplayName";
 
             try
             {
@@ -140,7 +139,10 @@ namespace LiftOff2014.DAC
                         candidate.CandidateID = int.Parse(dr["CandidateID"].ToString());
                         candidate.DisplayName = dr["DisplayName"].ToString();
                         candidate.Votes = int.Parse(dr["Votes"].ToString());
-
+                        candidate.ProjectedVotes = int.Parse(dr["ProjectedVotes"].ToString());
+                        candidate.TotalVotesAvailable = int.Parse(dr["TotalVotesAvailable"].ToString());
+                        candidate.TotalVotesCast = int.Parse(dr["TotalVotesCast"].ToString());
+       
                         candidates.Add(candidate);
                     }
                 }
@@ -163,7 +165,7 @@ namespace LiftOff2014.DAC
 
             StringBuilder sql = new StringBuilder();
 
-            sql.AppendFormat("select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID where votes.CountyID = {0} group by cand.CandidateID, cand.DisplayName", countyID.ToString());
+            sql.AppendFormat("select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes', isnull(sum(pvotes.ProjectedVotes),0) 'ProjectedVotes', county.Votes 'CountyVotesAvailable', dbo.FnGetVotesForCounty({0}) 'CountyVotesCast' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID left join CandidateProjectedVotes pvotes cand.CandidateID = pvotes.CandidateID where votes.CountyID = {1} group by cand.CandidateID, cand.DisplayName", countyID.ToString(), countyID.ToString());
 
             try { 
             SqlCommand command = new SqlCommand(sql.ToString(), this.Connection);
@@ -180,7 +182,10 @@ namespace LiftOff2014.DAC
                         candidate.CandidateID = int.Parse(dr["CandidateID"].ToString());
                         candidate.DisplayName = dr["DisplayName"].ToString();
                         candidate.Votes = int.Parse(dr["Votes"].ToString());
-
+                        candidate.ProjectedVotes = int.Parse(dr["ProjectedVotes"].ToString());
+                        candidate.TotalVotesAvailable = int.Parse(dr["CountyVotes"].ToString());
+                        candidate.TotalVotesCast = int.Parse(dr["CountyVotesCast"].ToString());
+           
                         candidates.Add(candidate);
                     }
                 }
