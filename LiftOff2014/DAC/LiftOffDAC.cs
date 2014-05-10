@@ -121,7 +121,7 @@ namespace LiftOff2014.DAC
         {
             List<Candidate> candidates = new List<Candidate>();
 
-            string sql = "select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes', isnull(sum(pvotes.ProjectedVotes),0), dbo.FnGetTotalVotesCast() 'TotalVotesCast', dbo.FnGetTotalVotesAvailable() 'TotalVotesAvailable' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID left join CandidateProjectedVotes pvotes cand.CandidateID = pvotes.CandidateID  group by cand.CandidateID, cand.DisplayName";
+            string sql = "select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes', isnull(sum(pvotes.ProjectedVotes),0), isnull(dbo.FnGetTotalVotesCast(),0) 'TotalVotesCast', dbo.FnGetTotalVotesAvailable() 'TotalVotesAvailable', isnull(dbo.GetTotalProjectedVotesForCandidate(cand.CandidateID), 0) 'ProjectedVotes' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID left join CandidateProjectedVotes pvotes on cand.CandidateID = pvotes.CandidateID  group by cand.CandidateID, cand.DisplayName";
 
             try
             {
@@ -165,7 +165,7 @@ namespace LiftOff2014.DAC
 
             StringBuilder sql = new StringBuilder();
 
-            sql.AppendFormat("select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes', isnull(sum(pvotes.ProjectedVotes),0) 'ProjectedVotes', county.Votes 'CountyVotesAvailable', dbo.FnGetVotesForCounty({0}) 'CountyVotesCast' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID left join CandidateProjectedVotes pvotes cand.CandidateID = pvotes.CandidateID where votes.CountyID = {1} group by cand.CandidateID, cand.DisplayName", countyID.ToString(), countyID.ToString());
+            sql.AppendFormat("select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes', isnull(sum(pvotes.ProjectedVotes),0) 'ProjectedVotes', sum(county.TotalVotes) 'CountyVotesAvailable', dbo.FnGetVotesForCounty({0}) 'CountyVotesCast' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID left join CandidateProjectedVotes pvotes on cand.CandidateID = pvotes.CandidateID left join Counties county on votes.CountyID = county.CountyID where votes.CountyID = {1} group by cand.CandidateID, cand.DisplayName", countyID.ToString(), countyID.ToString());
 
             try { 
             SqlCommand command = new SqlCommand(sql.ToString(), this.Connection);
