@@ -18,7 +18,10 @@ namespace LiftOff2014
 
             List<Candidate> candidates = this.liftOffBL.GetCandidateVotesForCounty(1);
 
-            List<Candidate> candidatesAll = this.liftOffBL.GetAllCandidateVotes(); 
+            List<Candidate> candidatesAll = this.liftOffBL.GetAllCandidateVotes();
+
+
+            this.liftOffBL.UpdateCandidateVotes(1, 1, 50); 
 
         }
 

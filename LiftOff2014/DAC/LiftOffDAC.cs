@@ -110,8 +110,8 @@ namespace LiftOff2014.DAC
         {
             StringBuilder sql = new StringBuilder();
 
-            sql.Append("update CandidateVotes set Votes = {0} where CandidateID = {1} and CountyID = {2}");
-            sql.AppendFormat(votes.ToString(), candidateID.ToString(), countyID.ToString());
+            sql.AppendFormat("update CandidateVotes set Votes = {0} where CandidateID = {1} and CountyID = {2}", votes.ToString(), candidateID.ToString(), countyID.ToString());
+            //sql.AppendFormat(votes.ToString(), candidateID.ToString(), countyID.ToString());
 
             return sql.ToString(); 
         }
@@ -183,7 +183,7 @@ namespace LiftOff2014.DAC
                         candidate.DisplayName = dr["DisplayName"].ToString();
                         candidate.Votes = int.Parse(dr["Votes"].ToString());
                         candidate.ProjectedVotes = int.Parse(dr["ProjectedVotes"].ToString());
-                        candidate.TotalVotesAvailable = int.Parse(dr["CountyVotes"].ToString());
+                        candidate.TotalVotesAvailable = int.Parse(dr["CountyVotesAvailable"].ToString());
                         candidate.TotalVotesCast = int.Parse(dr["CountyVotesCast"].ToString());
            
                         candidates.Add(candidate);
