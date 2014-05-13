@@ -165,7 +165,7 @@ namespace LiftOff2014.DAC
 
             StringBuilder sql = new StringBuilder();
 
-            sql.AppendFormat("select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes', isnull(sum(pvotes.ProjectedVotes),0) 'ProjectedVotes', sum(county.TotalVotes) 'CountyVotesAvailable', dbo.FnGetVotesForCounty({0}) 'CountyVotesCast' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID left join CandidateProjectedVotes pvotes on cand.CandidateID = pvotes.CandidateID left join Counties county on votes.CountyID = county.CountyID where votes.CountyID = {1} group by cand.CandidateID, cand.DisplayName", countyID.ToString(), countyID.ToString());
+            sql.AppendFormat("select cand.CandidateID, cand.DisplayName, isnull(sum(votes.Votes),0) 'Votes', isnull(sum(pvotes.ProjectedVotes),0) 'ProjectedVotes', max(county.TotalVotes) 'CountyVotesAvailable', dbo.FnGetVotesForCounty({0}) 'CountyVotesCast' from Candidates cand left join CandidateVotes votes on cand.CandidateID = votes.CandidateID left join CandidateProjectedVotes pvotes on cand.CandidateID = pvotes.CandidateID left join Counties county on votes.CountyID = county.CountyID where votes.CountyID = {1} group by cand.CandidateID, cand.DisplayName", countyID.ToString(), countyID.ToString());
 
             try { 
             SqlCommand command = new SqlCommand(sql.ToString(), this.Connection);
